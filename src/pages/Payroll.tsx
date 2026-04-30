@@ -137,18 +137,18 @@ const Payroll = () => {
 
   if (!connected) return (
     <AppShell>
-      <div className="mx-auto max-w-7xl px-6 py-24 text-center"><p className="text-muted-foreground">Connect your wallet to run payroll.</p></div>
+      <div className="mx-auto max-w-5xl px-6 py-16 text-center"><p className="text-muted-foreground">Connect your wallet to run payroll.</p></div>
     </AppShell>
   );
 
   return (
     <AppShell>
-      <section className="mx-auto max-w-7xl px-6 py-12">
+      <section className="mx-auto max-w-5xl px-6 py-8">
         <PageHeader eyebrow="Hidden Payroll" title="Payroll" description="Batch confidential salary payments to your team." />
 
-        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-5">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="card-elevated p-7">
+        <div className="mt-7 grid grid-cols-1 gap-5 lg:grid-cols-5">
+          <div className="lg:col-span-2 space-y-4">
+            <div className="card-elevated p-6">
               <div className="flex items-center justify-between">
                 <h2 className="font-display flex items-center gap-2 text-lg font-semibold tracking-tight"><UserPlus className="h-4 w-4 text-accent" />Add Team Member</h2>
                 <EncryptionPill state="sealed" />
@@ -161,8 +161,8 @@ const Payroll = () => {
               </div>
             </div>
 
-            <div className="card-elevated p-6">
-              <div className="space-y-3 divide-y divide-hairline">
+            <div className="card-elevated p-5">
+              <div className="space-y-2 divide-y divide-hairline">
                 {[["Team", team.length.toString()], ["Total", `${total.toFixed(2)} USDC`], ["Available USDC", `${balDisplay} USDC`]].map(([key, value], index) => (
                   <div key={index} className="flex items-center justify-between py-2 first:pt-0"><span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{key}</span><span className="font-mono text-sm font-semibold">{value}</span></div>
                 ))}
@@ -186,18 +186,18 @@ const Payroll = () => {
             </div>
           </div>
 
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4">
             <div className="card-elevated overflow-hidden">
-              <div className="flex items-center justify-between border-b border-hairline px-6 py-4">
+              <div className="flex items-center justify-between border-b border-hairline px-5 py-3.5">
                 <h2 className="font-display flex items-center gap-2 text-lg font-semibold tracking-tight"><Users className="h-4 w-4 text-accent" />Team List</h2>
                 <span className="rounded-full border border-hairline bg-secondary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{team.length} Members</span>
               </div>
               {team.length === 0 ? (
-                <div className="px-6 py-14 text-center"><div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-secondary text-muted-foreground ring-1 ring-hairline"><Users className="h-5 w-5" /></div><p className="mt-4 text-sm font-medium">No team members added yet.</p><p className="mt-1 text-xs text-muted-foreground">Use the form to add recipients.</p></div>
+                <div className="px-5 py-10 text-center"><div className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-secondary text-muted-foreground ring-1 ring-hairline"><Users className="h-4 w-4" /></div><p className="mt-4 text-sm font-medium">No team members added yet.</p><p className="mt-1 text-xs text-muted-foreground">Use the form to add recipients.</p></div>
               ) : (
                 <div>
                   {team.map((member, index) => (
-                    <div key={index} className="flex items-center justify-between border-b border-hairline px-6 py-4 last:border-0">
+                    <div key={index} className="flex items-center justify-between border-b border-hairline px-5 py-3.5 last:border-0">
                       <div><p className="text-sm font-medium">{member.name}</p><p className="font-mono text-xs text-muted-foreground">{member.wallet.slice(0, 6)}...{member.wallet.slice(-4)}</p></div>
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-sm font-semibold">{member.salary} USDC</span>
@@ -210,15 +210,15 @@ const Payroll = () => {
             </div>
 
             <div className="card-elevated overflow-hidden">
-              <div className="flex items-center justify-between border-b border-hairline px-6 py-4">
-                <h2 className="font-display flex items-center gap-2 text-lg font-semibold tracking-tight"><History className="h-4 w-4 text-accent" />Payroll History</h2>
+              <div className="flex items-center justify-between border-b border-hairline px-5 py-3.5">
+                <h2 className="font-display flex items-center gap-2 text-sm font-semibold tracking-tight"><History className="h-4 w-4 text-accent" />Payroll History</h2>
               </div>
               {history.length === 0 ? (
-                <div className="px-6 py-14 text-center"><div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-secondary text-muted-foreground ring-1 ring-hairline"><History className="h-5 w-5" /></div><p className="mt-4 text-sm font-medium">No payroll runs yet.</p><p className="mt-1 text-xs text-muted-foreground">Completed runs appear here for this wallet.</p></div>
+                <div className="px-5 py-10 text-center"><div className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-secondary text-muted-foreground ring-1 ring-hairline"><History className="h-4 w-4" /></div><p className="mt-4 text-sm font-medium">No payroll runs yet.</p><p className="mt-1 text-xs text-muted-foreground">Completed runs appear here for this wallet.</p></div>
               ) : (
                 <div>
                   {history.map((run, index) => (
-                    <div key={index} className="flex items-center justify-between border-b border-hairline px-6 py-4 last:border-0">
+                    <div key={index} className="flex items-center justify-between border-b border-hairline px-5 py-3.5 last:border-0">
                       <div><p className="font-mono text-xs text-muted-foreground">{run.id}</p><p className="text-sm font-medium">{run.date}</p></div>
                       <span className="rounded-full border border-hairline bg-secondary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{run.count} recipients</span>
                     </div>

@@ -226,13 +226,13 @@ const Invoices = () => {
 
   if (!connected) return (
     <AppShell>
-      <div className="mx-auto max-w-5xl px-6 py-24 text-center"><p className="text-muted-foreground">Connect your wallet to manage invoices.</p></div>
+      <div className="mx-auto max-w-5xl px-6 py-16 text-center"><p className="text-muted-foreground">Connect your wallet to manage invoices.</p></div>
     </AppShell>
   );
 
   if (payId) return (
     <AppShell>
-      <section className="mx-auto max-w-5xl px-6 py-12">
+      <section className="mx-auto max-w-5xl px-6 py-8">
         <PageHeader eyebrow="End-to-end encrypted" title="Pay Invoice" description="Amount is confidential - only your wallet can decrypt it." />
         <PaySection invoiceId={payId} />
       </section>
@@ -241,12 +241,12 @@ const Invoices = () => {
 
   return (
     <AppShell>
-      <section className="mx-auto max-w-5xl px-6 py-12">
+      <section className="mx-auto max-w-5xl px-6 py-8">
         <PageHeader eyebrow="End-to-end encrypted" title="Invoices" description="Create confidential invoices - amounts visible only to your client." />
 
-        <div className="mt-10 card-elevated overflow-hidden">
+        <div className="mt-7 card-elevated overflow-hidden">
           <div className="h-1 w-full bg-cyan-gradient" />
-          <div className="p-7">
+          <div className="p-6">
             <div className="flex items-center gap-2 rounded-xl border border-accent/25 bg-accent-soft px-4 py-3 text-sm">
               <Lock className="h-4 w-4 text-accent" />
               <span className="font-medium text-foreground">Amount is encrypted on-chain</span>
@@ -280,7 +280,7 @@ const Invoices = () => {
             </div>
 
             <Button onClick={handleCreate} disabled={!payerAddr || !amount || !dueDate || isEncrypting || isCreating || isCreateConfirming || !!createdId}
-              className="cta-cyan mt-7 h-12 w-full rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-cyan-gradient">
+              className="cta-cyan mt-5 h-11 w-full rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-cyan-gradient">
               <Plus className="mr-2 h-4 w-4" />
               {isEncrypting ? "Encrypting..." : isCreating ? "Confirm in wallet..." : isCreateConfirming ? "Creating..." : createdId ? "Invoice Created" : "Create Invoice"}
             </Button>
@@ -299,19 +299,19 @@ const Invoices = () => {
           </div>
         </div>
 
-        <div className="mt-12">
+        <div className="mt-8">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">My Invoices</p>
           {loading ? (
-            <div className="mt-4 card-elevated p-14 text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin text-accent" /><p className="mt-4 text-sm font-medium text-muted-foreground">Loading invoices...</p><p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Decrypting via Nox enclave</p></div>
+            <div className="mt-4 card-elevated p-10 text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin text-accent" /><p className="mt-4 text-sm font-medium text-muted-foreground">Loading invoices...</p><p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Decrypting via Nox enclave</p></div>
           ) : rows.length === 0 ? (
-            <div className="mt-4 card-elevated p-14 text-center"><div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-accent-soft text-accent ring-1 ring-accent/20"><FileText className="h-5 w-5" /></div><p className="mt-4 text-sm font-medium">No invoices yet.</p><p className="mt-1 text-xs text-muted-foreground">Create your first confidential invoice above.</p></div>
+            <div className="mt-4 card-elevated p-10 text-center"><div className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent ring-1 ring-accent/20"><FileText className="h-4 w-4" /></div><p className="mt-4 text-sm font-medium">No invoices yet.</p><p className="mt-1 text-xs text-muted-foreground">Create your first confidential invoice above.</p></div>
           ) : (
             <div className="mt-4 card-elevated overflow-hidden">
-              <div className="grid grid-cols-12 gap-4 border-b border-hairline px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <div className="grid grid-cols-12 gap-4 border-b border-hairline px-5 py-2.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 <div className="col-span-2">Invoice ID</div><div className="col-span-4">Counterparty</div><div className="col-span-2">Amount</div><div className="col-span-2">Date</div><div className="col-span-2 text-right">Status</div>
               </div>
               {rows.map((row, index) => (
-                <div key={index} className="grid grid-cols-12 items-center gap-4 border-b border-hairline px-6 py-5 last:border-0 hover:bg-secondary/40">
+                <div key={index} className="grid grid-cols-12 items-center gap-4 border-b border-hairline px-5 py-3.5 last:border-0 hover:bg-secondary/40">
                   <div className="col-span-2 font-mono text-xs text-muted-foreground">{row.id}</div>
                   <div className="col-span-4 flex items-center gap-3">
                     <div className="grid h-8 w-8 place-items-center rounded-lg bg-confidential text-accent ring-1 ring-white/10"><Lock className="h-3.5 w-3.5" /></div>

@@ -17,8 +17,8 @@ export const PageHeader = ({
         <span className="pulse-dot" />
         {eyebrow}
       </span>
-      <h1 className="font-display mt-4 text-4xl font-bold tracking-tight">{title}</h1>
-      <p className="mt-2 max-w-xl text-muted-foreground">{description}</p>
+      <h1 className="font-display mt-3 text-3xl font-bold tracking-tight">{title}</h1>
+      <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">{description}</p>
     </div>
     {children}
   </div>

@@ -47,22 +47,22 @@ const Settings = () => {
 
   return (
     <AppShell>
-      <section className="mx-auto max-w-4xl px-6 py-12">
+      <section className="mx-auto max-w-5xl px-6 py-8">
         <p className="eyebrow"><span className="pulse-dot" />Configuration</p>
-        <h1 className="font-display mt-4 text-4xl font-bold tracking-tight">Settings</h1>
-        <p className="mt-2 text-muted-foreground">Tune your confidentiality, attestation, and signing preferences.</p>
+        <h1 className="font-display mt-3 text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">Tune your confidentiality, attestation, and signing preferences.</p>
 
-        <div className="mt-10 space-y-5">
+        <div className="mt-7 space-y-4">
           {/* Enclave info */}
-          <div className="card-elevated p-6">
+          <div className="card-elevated p-5">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="font-display text-lg font-semibold tracking-tight">iExec Nox Enclave</h2>
+                <h2 className="font-display text-base font-semibold tracking-tight">iExec Nox Enclave</h2>
                 <p className="mt-1 text-sm text-muted-foreground">All sensitive computation is sealed inside the TEE.</p>
               </div>
               <EncryptionPill state="verified" />
             </div>
-            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
               {[
                 ["Connected wallet", shortAddr],
                 ["PaySec contract", `${NOVAPAY_ADDRESS.slice(0, 6)}…${NOVAPAY_ADDRESS.slice(-4)}`],
@@ -78,9 +78,9 @@ const Settings = () => {
           </div>
 
           {/* Privacy preferences */}
-          <div className="card-elevated p-6">
-            <h2 className="font-display text-lg font-semibold tracking-tight">Privacy Preferences</h2>
-            <div className="mt-6 divide-y divide-hairline">
+          <div className="card-elevated p-5">
+            <h2 className="font-display text-base font-semibold tracking-tight">Privacy Preferences</h2>
+            <div className="mt-4 divide-y divide-hairline">
               {[
                 { id: "mask", label: "Mask amounts by default", desc: "Always blur monetary values until hovered." },
                 { id: "auto-seal", label: "Auto-seal new invoices", desc: "Apply Nox encryption immediately on creation." },
@@ -98,10 +98,10 @@ const Settings = () => {
           </div>
 
           {/* ChainGPT Smart Contract Audit */}
-          <div className="card-elevated p-6">
+          <div className="card-elevated p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="font-display text-lg font-semibold tracking-tight">Smart Contract Audit</h2>
+                <h2 className="font-display text-base font-semibold tracking-tight">Smart Contract Audit</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Run an AI-powered security audit of the PaySec contract via ChainGPT.
                   {!hasApiKey && (
@@ -189,7 +189,7 @@ const Settings = () => {
           </div>
 
           {/* Trust anchor */}
-          <div className="card-confidential p-6">
+          <div className="card-confidential p-5">
             <div className="relative flex items-center gap-4">
               <ShieldCheck className="h-6 w-6 text-accent" />
               <div>

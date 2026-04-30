@@ -80,7 +80,7 @@ const Send = () => {
   if (!connected) {
     return (
       <AppShell>
-        <div className="mx-auto max-w-7xl px-6 py-24 text-center">
+        <div className="mx-auto max-w-5xl px-6 py-16 text-center">
           <p className="text-muted-foreground">Connect your wallet to send payments.</p>
         </div>
       </AppShell>
@@ -89,19 +89,19 @@ const Send = () => {
 
   return (
     <AppShell>
-      <section className="mx-auto max-w-7xl px-6 py-12">
+      <section className="mx-auto max-w-5xl px-6 py-8">
         <PageHeader eyebrow="Confidential Layer Active" title="Private Send" description="Amount is hidden on-chain via iExec Nox confidential token." />
 
-        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-5">
-          <div className="lg:col-span-3 space-y-6">
+        <div className="mt-7 grid grid-cols-1 gap-5 lg:grid-cols-5">
+          <div className="lg:col-span-3 space-y-4">
             {/* Send card */}
-            <div className="card-elevated p-7">
+            <div className="card-elevated p-6">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Available USDC</p>
-                <p className="font-mono text-lg font-semibold tracking-tight">{balDisplay} <span className="text-xs text-muted-foreground">USDC</span></p>
+                <p className="font-mono text-base font-semibold tracking-tight">{balDisplay} <span className="text-xs text-muted-foreground">USDC</span></p>
               </div>
 
-              <div className="mt-7 space-y-5">
+              <div className="mt-5 space-y-4">
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recipient address</label>
                   <input type="text" placeholder="0x…" value={recipient} onChange={e => setRecipient(e.target.value)}
@@ -141,16 +141,16 @@ const Send = () => {
             </div>
 
             {/* Unwrap card */}
-            <div className="card-elevated p-7">
+            <div className="card-elevated p-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="font-display text-lg font-semibold tracking-tight">Unwrap cUSDC → USDC</h2>
+                  <h2 className="font-display text-base font-semibold tracking-tight">Unwrap cUSDC → USDC</h2>
                   <p className="mt-1 text-sm text-muted-foreground">Enter the amount the sender told you. The Nox TEE verifies your confidential balance and finalizes the transfer on-chain.</p>
                 </div>
                 <EncryptionPill state="encrypting" />
               </div>
 
-              <div className="mt-6 space-y-4">
+              <div className="mt-5 space-y-4">
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Amount to unwrap (USDC)</label>
                   <input value={unwrapAmount} onChange={e => setUnwrapAmount(e.target.value)} type="text" placeholder="0.00"
@@ -172,14 +172,14 @@ const Send = () => {
             </div>
           </div>
 
-          {/* Right column — kept exactly from Lovable */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="card-elevated p-7">
-              <h2 className="font-display flex items-center gap-2 text-lg font-semibold tracking-tight">
+          {/* Right column */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="card-elevated p-6">
+              <h2 className="font-display flex items-center gap-2 text-base font-semibold tracking-tight">
                 <ShieldCheck className="h-4 w-4 text-accent" />
                 How unwrap works
               </h2>
-              <ol className="mt-6 space-y-5">
+              <ol className="mt-5 space-y-4">
                 {[
                   { n: 1, icon: Lock, title: "Encrypted Notification", desc: "The sender shares the confidential transfer amount via a secure channel." },
                   { n: 2, icon: Cpu, title: "TEE Verification", desc: "iExec Nox Trusted Execution Environment validates the balance without exposing it to the public mempool." },
