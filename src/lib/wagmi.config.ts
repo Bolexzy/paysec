@@ -11,8 +11,8 @@ const arbitrumSepoliaConfig = defineChain({
 const alchemyRpc = import.meta.env.VITE_ALCHEMY_RPC as string | undefined;
 
 export const wagmiConfig = getDefaultConfig({
-  appName: "NovaPay",
-  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "novapay-dev",
+  appName: "PaySec",
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "paysec-dev",
   chains: [arbitrumSepoliaConfig],
   // Use Alchemy if configured — supports unlimited getLogs range (no block chunking needed)
   transports: alchemyRpc

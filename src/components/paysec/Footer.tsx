@@ -10,6 +10,7 @@ export const Footer = () => (
         ))}
       </nav>
       <p className="text-xs text-muted-foreground">© 2026 PaySec Protocol · Confidentiality by Design</p>
+      <p className="text-[10px] text-muted-foreground/50 md:hidden lg:block">formerly NovaPay</p>
     </div>
   </footer>
 );

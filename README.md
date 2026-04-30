@@ -1,57 +1,126 @@
-# Sample Hardhat 3 Beta Project (`mocha` and `ethers`)
+# PaySec — Confidential Web3 Payments
 
-This project showcases a Hardhat 3 Beta project using `mocha` for tests and the `ethers` library for Ethereum interactions.
+A privacy-first B2B payment platform built on iExec's Trusted Execution Environment (TEE). PaySec lets businesses send invoices, pay salaries, and settle transactions on-chain without exposing sensitive financial figures to the public blockchain.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+Built for the **DoraHacks iExec Vibe-Coding Hackathon** · Deployed on **Arbitrum Sepolia**
 
-## Project Overview
+---
 
-This example project includes:
+## The Problem
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using `mocha` and ethers.js
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+Every on-chain payment is fully transparent — anyone can see amounts, frequency, and counterparties. This is a blocker for:
 
-## Usage
+- **Businesses paying employees** — salary figures become public
+- **Freelancers sending invoices** — rates visible to competitors
+- **B2B payments** — commercial terms exposed on-chain
 
-### Running Tests
+---
 
-To run all the tests in the project, execute the following command:
+## How PaySec Solves It
 
-```shell
-npx hardhat test
+PaySec uses iExec's **Nox Protocol** (ERC-7984 confidential tokens + TEE-sealed computation) to encrypt amounts end-to-end. Payment proof is recorded on-chain; the amount never is.
+
+### Core Features
+
+| Feature | What it does |
+|---|---|
+| **Private Send** | Wrap USDC into cUSDC via iExec Nox and send confidentially |
+| **Confidential Invoicing** | Create invoices with AES-encrypted amounts; only the payer can decrypt |
+| **Batch Payroll** | Run sealed salary payments to multiple wallets in one transaction |
+| **Audit Proof** | Generate a shareable payment proof (tx hash + block + timestamp) — confirms payment without revealing amount |
+| **Smart Contract Audit** | AI-powered security scan of the PaySec contract via ChainGPT |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Smart Contracts | Solidity + Hardhat 3 |
+| Confidential Computing | iExec Nox Protocol (ERC-7984, TFHE, NoxCompute) |
+| Chain | Arbitrum Sepolia (421614) |
+| Frontend | Vite + React + TypeScript + Tailwind CSS v3 |
+| Wallet | RainbowKit + wagmi |
+| Encryption | Web Crypto API (AES-GCM) |
+| Security Audit | ChainGPT Smart Contract Auditor |
+
+---
+
+## Contract
+
+**PaySec** — `0xF802a2ba4e80d6Ec9A2EC9142bD2De21F7378F89`  
+[View on Arbiscan](https://sepolia.arbiscan.io/address/0xF802a2ba4e80d6Ec9A2EC9142bD2De21F7378F89)
+
+Key functions:
+- `wrapAndSend(recipient, amount)` — confidential USDC transfer via Nox
+- `createInvoice(payer, encryptedAmount, refId, dueDate)` — create a sealed invoice
+- `payInvoice(invoiceId, amount)` — settle an invoice
+- `runPayroll(recipients[], amounts[])` — batch confidential salary run
+
+---
+
+## Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Copy env template and fill in values
+cp .env.example .env
+
+# Run frontend
+npm run dev
+
+# Deploy contract (Arbitrum Sepolia)
+npx hardhat run scripts/deploy.ts --network arbitrumSepolia
 ```
 
-You can also selectively run the Solidity or `mocha` tests:
+### Environment Variables
 
-```shell
-npx hardhat test solidity
-npx hardhat test mocha
+See `.env.example` for all required variables. Key ones:
+
+```
+VITE_NOVAPAY_ADDRESS=0xF802a2ba4e80d6Ec9A2EC9142bD2De21F7378F89
+VITE_WALLETCONNECT_PROJECT_ID=your_walletconnect_id
+VITE_CHAINGPT_API_KEY=your_chaingpt_key   # optional — demo mode if omitted
+VITE_ALCHEMY_RPC=https://arb-sepolia.g.alchemy.com/v2/your_key  # optional
 ```
 
-### Make a deployment to Sepolia
+---
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+## Privacy Model
 
-To run the deployment to a local chain:
+- Invoice amounts are encrypted client-side (AES-GCM) before any chain interaction
+- Only the payer's wallet can decrypt — no plaintext amount ever touches the chain or a server
+- `PrivateSent` and `InvoicePaid` events confirm payment happened; no amount field is emitted
+- iExec Nox TEE seals computation — even the node operator can't read values
+- Audit proofs are shareable URLs containing tx hash + block + timestamp only
 
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
+---
+
+## Project Structure
+
+```
+src/
+├── components/paysec/   # UI components (GlassNav, AuditProof, AmountDisplay, …)
+├── hooks/
+│   ├── usePaySec.ts     # All contract write hooks with gas overrides
+│   └── useChainGPTAudit.ts
+├── lib/
+│   ├── contracts.ts     # ABI + contract address
+│   ├── encryption.ts    # AES-GCM encrypt/decrypt
+│   ├── invoiceLink.ts   # ?id= link generation
+│   └── wagmi.config.ts  # RainbowKit + wagmi setup
+└── pages/
+    ├── Index.tsx        # Landing page
+    ├── Dashboard.tsx    # Payment activity overview
+    ├── Send.tsx         # Private send flow
+    ├── Received.tsx     # Incoming payments
+    ├── Invoices.tsx     # Invoice management
+    ├── Payroll.tsx      # Batch payroll
+    └── Settings.tsx     # ChainGPT audit + enclave config
 ```
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+---
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
-
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
-
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
-
-After setting the variable, you can run the deployment with the Sepolia network:
-
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+> **Note:** PaySec was formerly developed under the working title **NovaPay**. References to `NOVAPAY_ADDRESS`, `NOVAPAY_ABI`, and related env variables in the codebase are contract identifiers that predate the rename — they remain unchanged to preserve compatibility with the deployed contract and existing environment configurations.

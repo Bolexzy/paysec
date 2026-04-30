@@ -135,7 +135,7 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-3">
               <span className="pulse-dot" />
-              <span className="text-sm font-medium text-muted-foreground lg:text-xs xl:text-sm">Enclave online · NovaPay deployed</span>
+              <span className="text-sm font-medium text-muted-foreground lg:text-xs xl:text-sm">Enclave online · PaySec deployed</span>
             </div>
           </div>
         </div>

@@ -19,7 +19,7 @@ const CONTRACT_ADDRESS = "0xF802a2ba4e80d6Ec9A2EC9142bD2De21F7378F89";
 const DEMO_REPORT: AuditReport = {
   score: 94,
   summary:
-    "NovaPay demonstrates strong security practices. The contract correctly gates token flows behind allowance checks, uses iExec Nox confidential computation for amount privacy, and emits events for auditability without leaking values. Minor informational notes below.",
+    "PaySec demonstrates strong security practices. The contract correctly gates token flows behind allowance checks, uses iExec Nox confidential computation for amount privacy, and emits events for auditability without leaking values. Minor informational notes below.",
   findings: [
     {
       severity: "info",

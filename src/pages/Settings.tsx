@@ -65,7 +65,7 @@ const Settings = () => {
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               {[
                 ["Connected wallet", shortAddr],
-                ["NovaPay contract", `${NOVAPAY_ADDRESS.slice(0, 6)}…${NOVAPAY_ADDRESS.slice(-4)}`],
+                ["PaySec contract", `${NOVAPAY_ADDRESS.slice(0, 6)}…${NOVAPAY_ADDRESS.slice(-4)}`],
                 ["Network", "Arbitrum Sepolia · 421614"],
                 ["Region", "eu-west-1 · sgx"],
               ].map(([k, v]) => (
@@ -103,7 +103,7 @@ const Settings = () => {
               <div>
                 <h2 className="font-display text-lg font-semibold tracking-tight">Smart Contract Audit</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Run an AI-powered security audit of the NovaPay contract via ChainGPT.
+                  Run an AI-powered security audit of the PaySec contract via ChainGPT.
                   {!hasApiKey && (
                     <span className="ml-1 text-accent">
                       Demo mode — add <code className="font-mono text-xs">VITE_CHAINGPT_API_KEY</code> for live results.
