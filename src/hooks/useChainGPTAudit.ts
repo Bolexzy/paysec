@@ -149,27 +149,40 @@ async function readStream(res: Response): Promise<string> {
   const reader = res.body?.getReader();
   if (!reader) return "";
   const decoder = new TextDecoder();
-  let fullText = "";
+  let rawAccumulated = "";
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-    const chunk = decoder.decode(value, { stream: true });
-    for (const line of chunk.split("\n")) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed === "data: [DONE]") continue;
-      const raw = trimmed.startsWith("data: ") ? trimmed.slice(6) : trimmed;
-      try {
-        const parsed = JSON.parse(raw);
-        const text = parsed?.data?.bot ?? parsed?.bot ?? "";
-        if (text) fullText += text;
-      } catch {
-        // non-JSON line — skip
-      }
+    rawAccumulated += decoder.decode(value, { stream: true });
+  }
+
+  // Try to extract text from SSE lines
+  let botText = "";
+  for (const line of rawAccumulated.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed === "data: [DONE]") continue;
+    const raw = trimmed.startsWith("data: ") ? trimmed.slice(6) : trimmed;
+    try {
+      const parsed = JSON.parse(raw);
+      // Try every known field path ChainGPT might use
+      const chunk =
+        parsed?.data?.bot ??
+        parsed?.bot ??
+        parsed?.data?.text ??
+        parsed?.text ??
+        parsed?.content ??
+        parsed?.message ??
+        "";
+      if (chunk) botText += chunk;
+    } catch {
+      // Not JSON — if it looks like prose (not a protocol line), keep it
+      if (raw && !raw.startsWith("{") && raw.length > 10) botText += raw + " ";
     }
   }
 
-  return fullText.trim();
+  // If SSE parsing yielded nothing, use the full raw body as-is
+  return (botText.trim() || rawAccumulated.trim());
 }
 
 // Best-effort parse of ChainGPT's free-form audit text into AuditReport
@@ -235,7 +248,8 @@ export function useChainGPTAudit() {
         if (!res.ok) throw new Error(`ChainGPT API error: ${res.status}`);
 
         const text = await readStream(res);
-        if (!text) throw new Error("Empty response from ChainGPT");
+        console.log("ChainGPT raw response:", text);
+        if (!text) throw new Error("Empty response from ChainGPT — check console for raw output");
         setReport(parseAuditText(text));
       } else {
         // Demo mode — simulate API latency
