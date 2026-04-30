@@ -13,7 +13,108 @@ export interface AuditReport {
   generatedAt: string;
 }
 
-const CONTRACT_ADDRESS = "0xF802a2ba4e80d6Ec9A2EC9142bD2De21F7378F89";
+const CONTRACT_SOURCE = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract NovaPay is Ownable {
+    IERC20ToERC7984Wrapper public confidentialToken;
+    IERC20 public baseToken;
+
+    struct Invoice {
+        address creator;
+        address payer;
+        bytes encryptedAmount;
+        string refId;
+        uint256 dueDate;
+        bool paid;
+        uint256 createdAt;
+    }
+
+    mapping(bytes32 => Invoice) public invoices;
+    mapping(address => bytes32[]) public payrollRuns;
+
+    struct PayrollRun {
+        address[] recipients;
+        uint256 timestamp;
+        uint256 recipientCount;
+    }
+    mapping(bytes32 => PayrollRun) public payrollRunDetails;
+
+    event PrivateSent(address indexed from, address indexed to, uint256 timestamp);
+    event InvoiceCreated(bytes32 indexed invoiceId, address indexed creator, address indexed payer, string refId, uint256 dueDate);
+    event InvoicePaid(bytes32 indexed invoiceId, address indexed payer, uint256 timestamp);
+    event PayrollRunEvent(bytes32 indexed runId, address indexed employer, uint256 recipientCount, uint256 timestamp);
+
+    constructor(address _confidentialToken, address _baseToken) Ownable(msg.sender) {
+        confidentialToken = IERC20ToERC7984Wrapper(_confidentialToken);
+        baseToken = IERC20(_baseToken);
+    }
+
+    function wrapAndSend(address recipient, uint256 amount) external {
+        require(recipient != address(0), "invalid recipient");
+        require(amount > 0, "amount must be > 0");
+        bool pulled = baseToken.transferFrom(msg.sender, address(this), amount);
+        require(pulled, "token transfer failed");
+        baseToken.approve(address(confidentialToken), amount);
+        confidentialToken.wrap(recipient, amount);
+        emit PrivateSent(msg.sender, recipient, block.timestamp);
+    }
+
+    function createInvoice(address payer, bytes calldata encryptedAmount, string calldata refId, uint256 dueDate) external returns (bytes32 invoiceId) {
+        require(payer != address(0), "invalid payer");
+        require(encryptedAmount.length > 0, "empty encrypted amount");
+        require(dueDate > block.timestamp, "due date in past");
+        invoiceId = keccak256(abi.encodePacked(msg.sender, payer, refId, block.timestamp));
+        require(invoices[invoiceId].creator == address(0), "invoice already exists");
+        invoices[invoiceId] = Invoice({ creator: msg.sender, payer: payer, encryptedAmount: encryptedAmount, refId: refId, dueDate: dueDate, paid: false, createdAt: block.timestamp });
+        emit InvoiceCreated(invoiceId, msg.sender, payer, refId, dueDate);
+        return invoiceId;
+    }
+
+    function payInvoice(bytes32 invoiceId, uint256 amount) external {
+        Invoice storage invoice = invoices[invoiceId];
+        require(invoice.creator != address(0), "invoice not found");
+        require(!invoice.paid, "already paid");
+        require(invoice.payer == msg.sender, "not the payer");
+        require(block.timestamp <= invoice.dueDate, "invoice overdue");
+        require(amount > 0, "amount must be > 0");
+        invoice.paid = true;
+        bool pulled = baseToken.transferFrom(msg.sender, address(this), amount);
+        require(pulled, "token transfer failed");
+        baseToken.approve(address(confidentialToken), amount);
+        confidentialToken.wrap(invoice.creator, amount);
+        emit InvoicePaid(invoiceId, msg.sender, block.timestamp);
+    }
+
+    function runPayroll(address[] calldata recipients, uint256[] calldata amounts) external returns (bytes32 runId) {
+        require(recipients.length > 0, "no recipients");
+        require(recipients.length == amounts.length, "length mismatch");
+        require(recipients.length <= 100, "max 100 recipients");
+        uint256 total = 0;
+        for (uint256 i = 0; i < amounts.length; i++) {
+            require(amounts[i] > 0, "zero amount");
+            total += amounts[i];
+        }
+        bool pulled = baseToken.transferFrom(msg.sender, address(this), total);
+        require(pulled, "token transfer failed");
+        baseToken.approve(address(confidentialToken), total);
+        for (uint256 i = 0; i < recipients.length; i++) {
+            require(recipients[i] != address(0), "invalid recipient");
+            confidentialToken.wrap(recipients[i], amounts[i]);
+        }
+        runId = keccak256(abi.encodePacked(msg.sender, block.timestamp, recipients.length));
+        payrollRunDetails[runId] = PayrollRun({ recipients: recipients, timestamp: block.timestamp, recipientCount: recipients.length });
+        payrollRuns[msg.sender].push(runId);
+        emit PayrollRunEvent(runId, msg.sender, recipients.length, block.timestamp);
+        return runId;
+    }
+
+    function getMyPayrollRuns() external view returns (bytes32[] memory) { return payrollRuns[msg.sender]; }
+    function getPayrollRunDetails(bytes32 runId) external view returns (address[] memory recipients, uint256 timestamp) {
+        PayrollRun storage run = payrollRunDetails[runId];
+        return (run.recipients, run.timestamp);
+    }
+}`;
 
 // Demo report shown when no API key is configured
 const DEMO_REPORT: AuditReport = {
@@ -43,6 +144,67 @@ const DEMO_REPORT: AuditReport = {
   generatedAt: new Date().toISOString(),
 };
 
+// Read SSE stream and return the full bot response text
+async function readStream(res: Response): Promise<string> {
+  const reader = res.body?.getReader();
+  if (!reader) return "";
+  const decoder = new TextDecoder();
+  let fullText = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    for (const line of chunk.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed === "data: [DONE]") continue;
+      const raw = trimmed.startsWith("data: ") ? trimmed.slice(6) : trimmed;
+      try {
+        const parsed = JSON.parse(raw);
+        const text = parsed?.data?.bot ?? parsed?.bot ?? "";
+        if (text) fullText += text;
+      } catch {
+        // non-JSON line — skip
+      }
+    }
+  }
+
+  return fullText.trim();
+}
+
+// Best-effort parse of ChainGPT's free-form audit text into AuditReport
+function parseAuditText(text: string): AuditReport {
+  // Extract score — look for patterns like "Score: 87", "87/100", "score of 87"
+  const scoreMatch = text.match(/\b(\d{1,3})\s*(?:\/\s*100|out of 100)/i)
+    ?? text.match(/score[:\s]+(\d{1,3})/i);
+  const score = scoreMatch ? Math.min(100, parseInt(scoreMatch[1])) : 85;
+
+  // Extract findings by scanning for severity keywords followed by a title
+  const findings: AuditFinding[] = [];
+  const severities = ["critical", "high", "medium", "low", "info"] as const;
+  const findingRegex = /\b(critical|high|medium|low|info)\b[:\s–-]+([^\n.]{5,80})/gi;
+  let match;
+  while ((match = findingRegex.exec(text)) !== null) {
+    const sev = match[1].toLowerCase() as AuditFinding["severity"];
+    if (severities.includes(sev)) {
+      findings.push({
+        severity: sev,
+        title: match[2].trim().replace(/[*_`]/g, ""),
+        description: "",
+      });
+    }
+  }
+
+  // Use the first 600 chars of the text as summary (trim markdown artifacts)
+  const summary = text
+    .replace(/[*_`#]/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .slice(0, 600)
+    .trim();
+
+  return { score, summary, findings, generatedAt: new Date().toISOString() };
+}
+
 export function useChainGPTAudit() {
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<AuditReport | null>(null);
@@ -57,33 +219,24 @@ export function useChainGPTAudit() {
 
     try {
       if (apiKey) {
-        // Real ChainGPT Smart Contract Auditor API call
-        const res = await fetch("https://api.chaingpt.org/v1/smart-contract-auditor/audit", {
+        const res = await fetch("https://api.chaingpt.org/chat/stream", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
-            contractAddress: CONTRACT_ADDRESS,
-            network: "arbitrum-sepolia",
+            model: "smart_contract_auditor",
+            question: `Audit this Solidity smart contract. Provide a security score out of 100, a summary, and list any findings with severity (critical/high/medium/low/info) and a title.\n\n${CONTRACT_SOURCE}`,
+            chatHistory: "off",
           }),
         });
 
         if (!res.ok) throw new Error(`ChainGPT API error: ${res.status}`);
 
-        const data = await res.json();
-        // Map ChainGPT response to our AuditReport shape
-        setReport({
-          score: data.score ?? 90,
-          summary: data.summary ?? data.analysis ?? "Audit complete.",
-          findings: (data.findings ?? data.issues ?? []).map((f: any) => ({
-            severity: (f.severity ?? "info").toLowerCase(),
-            title: f.title ?? f.name ?? "Finding",
-            description: f.description ?? f.detail ?? "",
-          })),
-          generatedAt: new Date().toISOString(),
-        });
+        const text = await readStream(res);
+        if (!text) throw new Error("Empty response from ChainGPT");
+        setReport(parseAuditText(text));
       } else {
         // Demo mode — simulate API latency
         await new Promise((r) => setTimeout(r, 1800));
