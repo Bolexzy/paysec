@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 25% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 222 47% 11%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 220 20% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 220 20% 96%;
+    --muted-foreground: 218 14% 46%;
+    --accent: 186 100% 50%;
+    --accent-foreground: 222 47% 11%;
+    --accent-soft: 186 100% 95%;
+    --accent-glow: 186 100% 60%;
+    --confidential: 222 47% 8%;
+    --confidential-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 16% 91%;
+    --hairline: 220 14% 88%;
+    --input: 220 16% 91%;
+    --ring: 186 100% 50%;
+    --radius: 0.875rem;
+    --gradient-hero: radial-gradient(ellipse 80% 60% at 50% 0%, hsl(186 100% 95% / 0.6), transparent 70%),
+                     linear-gradient(180deg, hsl(220 25% 98%) 0%, hsl(220 30% 96%) 100%);
+    --gradient-cyan: linear-gradient(135deg, hsl(186 100% 55%), hsl(192 100% 50%));
+    --gradient-confidential: linear-gradient(160deg, hsl(222 47% 10%) 0%, hsl(222 47% 6%) 100%);
+    --shadow-hairline: 0 0 0 1px hsl(var(--hairline));
+    --shadow-soft: 0 1px 2px hsl(222 47% 11% / 0.04), 0 4px 16px hsl(222 47% 11% / 0.04);
+    --shadow-elevated: 0 1px 2px hsl(222 47% 11% / 0.04), 0 12px 32px -8px hsl(222 47% 11% / 0.08);
+    --shadow-glow-cyan: 0 0 0 1px hsl(186 100% 50% / 0.2), 0 8px 28px -6px hsl(186 100% 50% / 0.35);
+    --shadow-cta: 0 1px 0 hsl(0 0% 100% / 0.4) inset, 0 8px 24px -6px hsl(186 100% 45% / 0.5);
+  }
+
+  .dark {
+    --background: 222 47% 5%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 186 100% 50%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 222 30% 14%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 30% 12%;
+    --muted-foreground: 218 14% 65%;
+    --accent: 186 100% 50%;
+    --accent-foreground: 222 47% 8%;
+    --accent-soft: 186 60% 14%;
+    --accent-glow: 186 100% 60%;
+    --confidential: 222 47% 6%;
+    --confidential-foreground: 210 40% 98%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 30% 16%;
+    --hairline: 222 30% 18%;
+    --input: 222 30% 16%;
+    --ring: 186 100% 50%;
+    --gradient-hero: radial-gradient(ellipse 80% 60% at 50% 0%, hsl(186 100% 30% / 0.18), transparent 70%),
+                     linear-gradient(180deg, hsl(222 47% 5%) 0%, hsl(222 47% 4%) 100%);
+    --gradient-confidential: linear-gradient(160deg, hsl(222 47% 9%) 0%, hsl(222 47% 5%) 100%);
+    --shadow-soft: 0 1px 2px hsl(0 0% 0% / 0.3), 0 4px 16px hsl(0 0% 0% / 0.25);
+    --shadow-elevated: 0 1px 2px hsl(0 0% 0% / 0.4), 0 16px 40px -8px hsl(0 0% 0% / 0.5);
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+  body { @apply bg-background text-foreground; font-family: 'Inter', system-ui, sans-serif; font-feature-settings: "cv11", "ss01", "ss03"; }
+  ::selection { background: hsl(var(--accent) / 0.3); color: hsl(var(--foreground)); }
+}
+
+@layer components {
+  .glass-nav {
+    background: hsl(var(--background) / 0.72);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    backdrop-filter: saturate(180%) blur(16px);
+    border-bottom: 1px solid hsl(var(--hairline));
+  }
+
+  .card-elevated {
+    @apply bg-card text-card-foreground rounded-2xl;
+    border: 1px solid hsl(var(--hairline));
+    box-shadow: var(--shadow-soft);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
+  }
+  .card-elevated:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevated);
+    border-color: hsl(var(--accent) / 0.3);
+  }
+
+  .card-confidential {
+    background: var(--gradient-confidential);
+    color: hsl(var(--confidential-foreground));
+    border: 1px solid hsl(222 30% 16%);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-elevated);
+    position: relative;
+    overflow: hidden;
+  }
+  .card-confidential::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(hsl(186 100% 50% / 0.06) 1px, transparent 1px);
+    background-size: 18px 18px;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .pulse-dot {
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: hsl(var(--accent));
+    box-shadow: 0 0 0 0 hsl(var(--accent) / 0.6);
+    animation: paysec-pulse 2s ease-out infinite;
+  }
+
+  .cta-cyan {
+    background: var(--gradient-cyan);
+    color: hsl(222 47% 11%);
+    box-shadow: var(--shadow-cta);
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out, filter 180ms ease-out;
+  }
+  .cta-cyan:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: var(--shadow-glow-cyan), var(--shadow-cta);
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold tracking-[0.16em] uppercase;
+    background: hsl(var(--accent-soft));
+    color: hsl(222 47% 11%);
+    border: 1px solid hsl(var(--accent) / 0.25);
+  }
+  .dark .eyebrow { color: hsl(var(--accent)); }
+
+  .hero-mesh {
+    background-image:
+      linear-gradient(hsl(var(--foreground) / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 75%);
+  }
+
+  .redact {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    letter-spacing: 0.04em;
+    cursor: default;
+    transition: color 180ms ease-out, filter 180ms ease-out;
+  }
+  .redact[data-masked="true"] { filter: blur(6px); color: hsl(var(--muted-foreground)); }
+  .redact[data-masked="true"]:hover { filter: blur(0); color: hsl(var(--foreground)); }
+
+  .shimmer {
+    background: linear-gradient(90deg, hsl(var(--accent) / 0.0) 0%, hsl(var(--accent) / 0.35) 50%, hsl(var(--accent) / 0.0) 100%);
+    background-size: 200% 100%;
+    animation: paysec-shimmer 1.8s linear infinite;
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: 'Inter Tight', 'Inter', system-ui, sans-serif; letter-spacing: -0.025em; }
+  .bg-hero { background: var(--gradient-hero); }
+  .bg-cyan-gradient { background: var(--gradient-cyan); }
+  .bg-gradient-cyan { background: var(--gradient-cyan); }
+  .bg-accent-soft { background-color: hsl(var(--accent-soft)); }
+  .bg-confidential { background: var(--gradient-confidential); }
+  .text-confidential-foreground { color: hsl(var(--confidential-foreground)); }
+  .text-accent-glow { color: hsl(var(--accent-glow)); }
+  .border-hairline { border-color: hsl(var(--hairline)); }
+  .text-balance { text-wrap: balance; }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-glow-cyan { box-shadow: var(--shadow-glow-cyan); }
+  .shadow-cta { box-shadow: var(--shadow-cta); }
+  .focus\:shadow-glow-cyan:focus { box-shadow: var(--shadow-glow-cyan); }
+}
+
+@keyframes paysec-pulse {
+  0%   { box-shadow: 0 0 0 0 hsl(var(--accent) / 0.55); }
+  70%  { box-shadow: 0 0 0 10px hsl(var(--accent) / 0); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--accent) / 0); }
+}
+@keyframes paysec-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
