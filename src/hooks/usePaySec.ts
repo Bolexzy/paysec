@@ -110,6 +110,7 @@ export function useCreateInvoice() {
       abi: NOVAPAY_ABI,
       functionName: "createInvoice",
       args: [payer, encryptedAmount, refId, BigInt(dueDate)],
+      gas: 500_000n,
       ...gas,
     });
 
@@ -128,6 +129,7 @@ export function usePayInvoice() {
       abi: NOVAPAY_ABI,
       functionName: "payInvoice",
       args: [invoiceId, parseUnits(amountUSDC, USDC_DECIMALS)],
+      gas: 500_000n,
       ...gas,
     });
 
@@ -149,6 +151,7 @@ export function useRunPayroll() {
         recipients,
         amountsUSDC.map(a => parseUnits(a, USDC_DECIMALS)),
       ],
+      gas: 1_000_000n,
       ...gas,
     });
 
