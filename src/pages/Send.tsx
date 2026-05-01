@@ -37,8 +37,12 @@ const Send = () => {
   const allowance = useUSDCAllowance();
   const hasAllowance = (allowance.data ?? 0n) >= amountBig && amountBig > 0n;
   const isValidRecipient = recipient.startsWith("0x") && recipient.length === 42;
-  const { approve, isPending: isApproving, isConfirming: isApproveConfirming } = useApproveUSDC();
+  const { approve, isPending: isApproving, isConfirming: isApproveConfirming, isSuccess: approved } = useApproveUSDC();
   const { wrapAndSend, isPending: isSending, isConfirming: isSendConfirming, isSuccess: sent, hash: sendHash } = useWrapAndSend();
+
+  useEffect(() => {
+    if (approved) allowance.refetch();
+  }, [approved]);
 
   const handleMaxAmount = () => {
     if (usdcBal) setAmount(formatUnits(usdcBal, 6));
